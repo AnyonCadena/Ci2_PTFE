@@ -7,10 +7,10 @@
 <body>
     <script src="js/oidc-client.js"></script>
     <script>
-        new Oidc.UserManager().signinRedirectCallback().then(function () {
+        new Oidc.UserManager().signinRedirectCallback().then(function () {            
             window.location = "index.html";
         }).catch(function (e) {
-            console.error(e);
+            //console.error(e);
         });
     </script>
 </body>

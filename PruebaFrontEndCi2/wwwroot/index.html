@@ -1,17 +1,195 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script src="bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="bootstrap/dist/css/fontawesome-all.min.css" rel="stylesheet" />
+    <link href="bootstrap/dist/js/fa-svg-with-js.css" rel="stylesheet" />
     <meta charset="utf-8" />
     <title></title>
 </head>
 <body>
-    <button id="login">Login</button>
-    <button id="api">Call API</button>
-    <button id="logout">Logout</button>
-
-    <pre id="results"></pre>
-
+    <div id="inicioDeSesion" style="display:none">
+        <section class="container-fluid">
+            <button id="inicioSesion">Iniciar</button>
+            <label id="results" style="visibility:hidden"></label>
+        </section>
+    </div>
+    <div id="contenidoPagina" style="display:none">
+        <div class="offset-md-2 col-md-8">
+            <nav class="container-fluid">
+                <div class="col-md-12 border" style="margin-top:10px;padding-bottom: 10px; padding-top:10px">
+                    <div class="btn-toolbar justify-content-between">
+                        <button id="btnNuevaTarea" type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalCrearTarea">
+                            Nueva tarea
+                        </button>
+                        <div class="row border rounded border-secondary">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text" style="background:white; border:0">
+                                        <input id="filtroTodas" type="radio" name="opcionRadio">
+                                    </div>
+                                </div>
+                                <span type="text" class="form-control-sm" style="border:0">Todas</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text" style="background:white; border:0">
+                                        <input id="fitroFinalizadas" type="radio" name="opcionRadio">
+                                    </div>
+                                </div>
+                                <span type="text" class="form-control-sm" style="border:0">Finalizadas</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text" style="background:white; border:0">
+                                        <input id="filtroPendientes" type="radio" name="opcionRadio">
+                                    </div>
+                                </div>
+                                <span type="text" class="form-control-sm" style="border:0">Pendientes</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" class="form-control-sm" placeholder="descripción">
+                            <div class="input-group-append">
+                                <button class="btn btn-sm btn-outline-light border text-dark" type="button">buscar</button>
+                            </div>
+                        </div>
+                        <button id="cerrarSesion" type="button" class="btn btn-sm btn-secondary">
+                            Cerrar sesión
+                        </button>
+                    </div>
+                </div>
+            </nav>
+            <br />
+            <section class="container-fluid">
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </section>
+            <div id="divTareas" class="bg-light">
+            </div>
+        </div>
+        <footer class="container-fluid bg-dark text-primary fixed-bottom">
+            <div class="offset-md-2 col-md-8 text-center">
+                Prueba técnica FrontEnd Ci2 - Anyon Fabian Cadena Florez
+            </div>
+        </footer>
+        <!-- Modal Crear Tarea -->
+        <div class="modal fade" id="modalCrearTarea" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Nueva tarea</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="descripcion">Descripción</label>
+                                <textarea id="descripcion" class="form-control" aria-label="With textarea"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="fechaVencimiento">Fecha de vencimiento</label>
+                                <br /><input id="fechaVencimiento" class="form-control" type="date" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button id="crearTarea" type="button" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Actualizar Tarea -->
+        <div class="modal fade" id="modalActualizarTarea" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Actualizar tarea</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="descripcion">Descripción</label>
+                                <textarea id="descripcion" class="form-control" aria-label="With textarea"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="fechaVencimiento">Fecha de vencimiento</label>
+                                <br /><input id="fechaVencimiento" class="form-control" type="date" />
+                            </div>
+                            <div class="row col-md-12">
+                                <div class="input-group col-md-6 float-left" s>
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text" style="background:white; border:0">
+                                            <input id="fitroFinalizadas" type="radio" name="opcionRadio">
+                                        </div>
+                                    </div>
+                                    <span type="text" class="form-control-sm" style="border:0">Finalizada</span>
+                                </div>
+                                <div class="input-group col-md-6 float-left">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text" style="background:white; border:0">
+                                            <input id="filtroPendientes" type="radio" name="opcionRadio">
+                                        </div>
+                                    </div>
+                                    <span type="text" class="form-control-sm" style="border:0">Pendiente</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button id="actualizarTarea" type="button" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Borrar Tarea -->
+        <div class="modal fade" id="modalBorrarTarea" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Borrar tarea</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="form-group">
+                                <label for="descripcion">Descripción</label>
+                                <label id="descripcion">Descripción</label>
+                            </div>
+                            <div class="form-group">
+                                <label for="fechaVencimiento">Fecha de vencimiento</label>
+                                <label id="fechaVencimiento">Fecha de vencimiento</label>
+                            </div>
+                            <div class="form-group">
+                                <label for="fechaVencimiento">Fecha de vencimiento</label>
+                                <label id="fechaVencimiento">Fecha de vencimiento</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="borrarTarea" type="button" class="btn btn-primary">Borrar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="js/oidc-client.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/app2.js"></script>
 </body>
 </html>
