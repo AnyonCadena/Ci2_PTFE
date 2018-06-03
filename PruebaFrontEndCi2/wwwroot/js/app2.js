@@ -1,4 +1,8 @@
-﻿//var api_url = "http://localhost:5001";
+﻿$(function() {
+    $("#filtroTodas").attr('checked', true);
+});
+
+//var api_url = "http://localhost:5001";
 var api_url = "https://drsgps.co/protectedapi"
 
 //var authority_url = "http://localhost:5000";
@@ -54,6 +58,10 @@ $("#cerrarSesion").click(function () {
 $("#crearTarea").click(function () {
     crearTarea();
 });
+$("#borrarTarea").click(function () {
+    borrarTarea();
+});
+
 
 function inicioSesion() {
     mgr.signinRedirect();
@@ -90,7 +98,7 @@ function call_get_tareas(consulta) {
                 content += '</div></div></div>';
                 content += '<div class="modal-footer">';
                 content += '<button value="' + element.id + '" onclick="actualizarTarea(\'' + element.id + '\')" name="actualizarTarea" type="button" class="btn btn-primary">Actualizar</button>';
-                content += '<button value="' + element.id + '" onclick="borrarTarea(\'' + element.id + '\')" name="borrarTarea" type="button" class="btn btn-danger"> Borrar</button>';
+                content += '<button value="' + element.id + '" onclick="abrirModalBorrar(\'' + element.id + '\')" name="borrarTarea" type="button" class="btn btn-danger"> Borrar</button>';
                 content += '</div></div>';
             });
             document.getElementById("divTareas").innerHTML = content;
@@ -110,8 +118,20 @@ function crearTarea() {
     call_post_tarea(tarea);
 }
 
-function borrarTarea(id) {
-    call_delete_tarea(id);
+var idBorrar;
+
+
+
+function borrarTarea() {
+    if (idBorrar != null) {
+        call_delete_tarea(idBorrar);
+    }
+}
+
+
+function abrirModalBorrar(id) {
+    $("#modalBorrarTarea").modal("show");
+    idBorrar = id;
 }
 
 function call_post_tarea(tarea) {
@@ -151,6 +171,7 @@ function call_delete_tarea(id) {
         xhr.open("POST", url);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.onload = function () {
+            $("#modalBorrarTarea").modal("hide");
             call_get_tareas(null);
         }
         xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
