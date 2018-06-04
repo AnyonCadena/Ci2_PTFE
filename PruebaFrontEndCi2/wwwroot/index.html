@@ -11,15 +11,21 @@
 </head>
 <body>
     <div id="inicioDeSesion" style="display:none">
-        <section class="container-fluid">
-            <button id="inicioSesion">Iniciar</button>
-            <label id="results" style="visibility:hidden"></label>
-        </section>
+        <div class="offset-4 col-md-4" style="padding-top:200px">
+            <div class="card bg-light" style="box-shadow: 5px 5px #bababa">
+                <div class="card-header text-center">
+                    <h3 class="card-title">Gestión de Tareas</h3>
+                </div>
+                <div class="card-body text-center">
+                    <button id="inicioSesion" class="btn btn-lg btn-info">Iniciar Sesión</button>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="contenidoPagina" style="display:none">
         <div class="offset-md-2 col-md-8">
             <nav class="container-fluid">
-                <div class="col-md-12 border" style="margin-top:10px;padding-bottom: 10px; padding-top:10px">
+                <div class="col-md-12 border" style="margin-top:10px;margin-bottom:10px;padding-bottom: 10px; padding-top:10px">
                     <div class="btn-toolbar justify-content-between">
                         <button id="btnNuevaTarea" type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalCrearTarea">
                             Nueva tarea
@@ -28,7 +34,7 @@
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text" style="background:white; border:0">
-                                        <input id="filtroTodas" type="radio" name="opcionRadio">
+                                        <input id="filtroTodas" type="radio" value="0" name="opcionRadio">
                                     </div>
                                 </div>
                                 <span type="text" class="form-control-sm" style="border:0">Todas</span>
@@ -36,7 +42,7 @@
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text" style="background:white; border:0">
-                                        <input id="fitroFinalizadas" type="radio" name="opcionRadio">
+                                        <input id="filtroFinalizadas" type="radio" value="true" name="opcionRadio">
                                     </div>
                                 </div>
                                 <span type="text" class="form-control-sm" style="border:0">Finalizadas</span>
@@ -44,16 +50,16 @@
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text" style="background:white; border:0">
-                                        <input id="filtroPendientes" type="radio" name="opcionRadio">
+                                        <input id="filtroPendientes" type="radio" value="false" name="opcionRadio">
                                     </div>
                                 </div>
                                 <span type="text" class="form-control-sm" style="border:0">Pendientes</span>
                             </div>
                         </div>
                         <div class="input-group">
-                            <input type="text" class="form-control-sm" placeholder="descripción">
+                            <input id="textoDescripcion" type="text" class="form-control-sm" placeholder="descripción">
                             <div class="input-group-append">
-                                <button class="btn btn-sm btn-outline-light border text-dark" type="button">buscar</button>
+                                <button id="buscarTareas" class="btn btn-sm btn-outline-light border text-dark" type="button">buscar</button>
                             </div>
                         </div>
                         <button id="cerrarSesion" type="button" class="btn btn-sm btn-secondary">
@@ -62,17 +68,19 @@
                     </div>
                 </div>
             </nav>
-            <br />
             <section class="container-fluid">
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+                <div id="cuadroAlerta" class="alert alert-dismissible fade show" role="alert" style="display:none">
+                    <strong id="tituloAlerta"></strong>
+                    <span id="mensajeAlerta"></span>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
             </section>
-            <div id="divTareas" class="bg-light">
-            </div>
+            <section class="container-fluid">
+                <div id="divTareas">
+                </div>
+            </section>
         </div>
         <footer class="container-fluid bg-dark text-primary fixed-bottom">
             <div class="offset-md-2 col-md-8 text-center">
@@ -122,17 +130,17 @@
                         <form>
                             <div class="form-group">
                                 <label for="descripcion">Descripción</label>
-                                <textarea id="descripcion" class="form-control" aria-label="With textarea"></textarea>
+                                <textarea id="descripcionActualizar" class="form-control" aria-label="With textarea"></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="fechaVencimiento">Fecha de vencimiento</label>
-                                <br /><input id="fechaVencimiento" class="form-control" type="date" />
+                                <br /><input id="fechaVencimientoActualizar" class="form-control" type="date" />
                             </div>
                             <div class="row col-md-12">
                                 <div class="input-group col-md-6 float-left" s>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text" style="background:white; border:0">
-                                            <input id="fitroFinalizadas" type="radio" name="opcionRadio">
+                                            <input id="filtroFinalizadasActualizar" type="radio" name="opcionRadioActualizar">
                                         </div>
                                     </div>
                                     <span type="text" class="form-control-sm" style="border:0">Finalizada</span>
@@ -140,7 +148,7 @@
                                 <div class="input-group col-md-6 float-left">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text" style="background:white; border:0">
-                                            <input id="filtroPendientes" type="radio" name="opcionRadio">
+                                            <input id="filtroPendientesActualizar" type="radio" name="opcionRadioActualizar">
                                         </div>
                                     </div>
                                     <span type="text" class="form-control-sm" style="border:0">Pendiente</span>
