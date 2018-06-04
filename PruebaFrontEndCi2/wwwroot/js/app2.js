@@ -1,36 +1,36 @@
 ﻿$(function () {
     $("#filtroTodas").attr('checked', true);
-    call_get_tareas(listarTareas);
+    peticionObtenerTareas(listarTareas);
 });
 
 //var api_url = "http://localhost:5001";
 var api_url = "https://drsgps.co/protectedapi"
 
-//var authority_url = "http://localhost:5000";
-var authority_url = "https://drsgps.co/identity";
+//var autorizacion_url = "http://localhost:5000";
+var autorizacion_url = "https://drsgps.co/identity";
 
-var this_url = "http://localhost:5003";
-//var this_url = "https://drsgps.co/jsclient";
+var local_url = "http://localhost:5003";
+//var local_url = "https://drsgps.co/jsclient";
 
-var config = {
-    authority: authority_url,
+var configuracion = {
+    authority: autorizacion_url,
     client_id: "js",
-    redirect_uri: this_url + "/callback.html",
+    redirect_uri: local_url + "/callback.html",
     response_type: "id_token token",
     scope: "openid profile api1",
-    post_logout_redirect_uri: this_url + "/index.html",
+    post_logout_redirect_uri: local_url + "/index.html",
 };
 
-var mgr = new Oidc.UserManager(config);
+var gestionUsuario = new Oidc.UserManager(configuracion);
 
-mgr.getUser().then(function (user) {
+gestionUsuario.getUser().then(function (user) {
     if (user) {
-        log("User logged in", user.profile);
+        log("user logged in", user.profile);
         $("#contenidoPagina").show();
-        call_get_tareas(function () { listarTareas(); });
+        peticionObtenerTareas(listarTareas());
     }
     else {
-        log("User not logged in");
+        log("user not logged in");
         $("#inicioDeSesion").show();
     }
 });
@@ -49,6 +49,11 @@ function log() {
     });
 }
 
+$("#btnNuevaTarea").click(function () {
+    $("#descripcion").val('');
+    $("#fechaVencimiento").val('');
+});
+
 $("#inicioSesion").click(function () {
     inicioSesion();
 });
@@ -66,19 +71,19 @@ $("#actualizarTarea").click(function () {
 });
 $("#filtroTodas").change(function () {
     var consulta = listarTareas();
-    call_get_tareas(consulta);
+    peticionObtenerTareas(consulta);
 });
 $("#filtroFinalizadas").click(function () {
     var consulta = listarTareas();
-    call_get_tareas(consulta);
+    peticionObtenerTareas(consulta);
 });
 $("#filtroPendientes").click(function () {
     var consulta = listarTareas();
-    call_get_tareas(consulta);
+    peticionObtenerTareas(consulta);
 });
 $("#buscarTareas").click(function () {
     var consulta = listarTareas();
-    call_get_tareas(consulta);
+    peticionObtenerTareas(consulta);
 });
 
 function listarTareas() {
@@ -105,17 +110,15 @@ function listarTareas() {
 }
 
 function inicioSesion() {
-    mgr.signinRedirect();
+    gestionUsuario.signinRedirect();
 }
 
 function cerrarSesion() {
-    mgr.signoutRedirect();
+    gestionUsuario.signoutRedirect();
 }
 
-function call_get_tareas(consulta) {
-    mgr.getUser().then(function (user) {
-        var q = consulta || {};
-        //var url = api_url + "/tareas/consultar?" + convert_to_url_paramas(q);
+function peticionObtenerTareas(consulta) {
+    gestionUsuario.getUser().then(function (user) {
         var url = api_url + "/tareas/consultar?" + consulta;
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url);
@@ -123,8 +126,6 @@ function call_get_tareas(consulta) {
             var tareas = JSON.parse(xhr.responseText);
             log(xhr.status, tareas);
 
-            //https://stackoverflow.com/questions/8749236/create-table-with-jquery-append?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-            /* Note that the whole content variable is just a string */
             var content = '';
             var No = 'No';
             var Si = 'Si';
@@ -159,7 +160,7 @@ function crearTarea() {
         descripcion: $("#descripcion").val(),
         fechaVencimiento: $("#fechaVencimiento").val()
     }
-    call_post_tarea(tarea);
+    peticionCrearTarea(tarea);
 }
 
 var idBorrar;
@@ -167,7 +168,7 @@ var idActualizar;
 
 function borrarTarea() {
     if (idBorrar != null) {
-        call_delete_tarea(idBorrar);
+        peticionBorrarTarea(idBorrar);
     }
 }
 
@@ -179,7 +180,7 @@ function actualizarTarea() {
             fechaVencimiento: $("#fechaVencimientoActualizar").val(),
             finalizada: $('#filtroFinalizadasActualizar').is(':checked')
         }
-        call_put_tarea(tarea);
+        peticionActualizarTarea(tarea);
     }
 }
 
@@ -192,7 +193,6 @@ function abrirModalActualizar(id) {
     idActualizar = id;
     $("#descripcionActualizar").text($("#descripcion" + id).text());
     $("#fechaVencimientoActualizar").val($("#fechaVencimiento" + id).text().substring(0, 10));
-    console.log($("#Estado" + id).text());
     if ($("#Estado" + id).text() == 'No') {
         $("#filtroPendientesActualizar").attr("checked", true);
     }
@@ -210,42 +210,41 @@ function mostrarAlerta(tipoAlerta, tituloAlerta, mensajeAlerta) {
     $("#mensajeAlerta").append(mensajeAlerta);
 }
 
-function call_post_tarea(tarea) {
-    mgr.getUser().then(function (user) {
+function peticionCrearTarea(tarea) {
+    gestionUsuario.getUser().then(function (user) {
         var url = api_url + "/tareas/crear"
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.onload = function () {
-            log(xhr.status, JSON.parse(xhr.responseText));
             $("#modalCrearTarea").modal("hide");
             mostrarAlerta("alert-success", "!Exito¡", "La tarea ha sido creada exitosamente");
-            call_get_tareas(listarTareas());
+            peticionObtenerTareas(listarTareas());
         }
         xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
         xhr.send(JSON.stringify(tarea));
     });
 }
 
-function call_put_tarea(tarea) {
-    mgr.getUser().then(function (user) {
+function peticionActualizarTarea(tarea) {
+    gestionUsuario.getUser().then(function (user) {
         var url = api_url + "/tareas/actualizar"
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.onload = function () {
-            log(xhr.status, JSON.parse(xhr.responseText));
             $("#modalActualizarTarea").modal("hide");
             mostrarAlerta("alert-success", "!Exito¡", "La tarea ha sido actualizada exitosamente");
-            call_get_tareas(listarTareas());
+            idActualizar = null;
+            peticionObtenerTareas(listarTareas());
         }
         xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
         xhr.send(JSON.stringify(tarea));
     });
 }
 
-function call_delete_tarea(id) {
-    mgr.getUser().then(function (user) {
+function peticionBorrarTarea(id) {
+    gestionUsuario.getUser().then(function (user) {
         var url = api_url + "/tareas/borrar"
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url);
@@ -253,20 +252,10 @@ function call_delete_tarea(id) {
         xhr.onload = function () {
             $("#modalBorrarTarea").modal("hide");
             mostrarAlerta("alert-success", "!Exito¡", "La tarea ha sido borrada exitosamente");
-            call_get_tareas(listarTareas());
+            idBorrar = null;
+            peticionObtenerTareas(listarTareas());
         }
         xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
         xhr.send(JSON.stringify({ id: id }));
     });
-}
-
-function convert_to_url_paramas(data) {
-    var str = "";
-    for (var key in data) {
-        if (str != "") {
-            str += "&";
-        }
-        str += key + "=" + encodeURIComponent(data[key]);
-    }
-    return str;
 }
