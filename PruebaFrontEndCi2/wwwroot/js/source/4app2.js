@@ -25,29 +25,13 @@ var gestionUsuario = new Oidc.UserManager(configuracion);
 
 gestionUsuario.getUser().then(function (user) {
     if (user) {
-        log("user logged in", user.profile);
         $("#contenidoPagina").show();
         peticionObtenerTareas(listarTareas());
     }
     else {
-        log("user not logged in");
         $("#inicioDeSesion").show();
     }
 });
-
-function log() {
-    //document.getElementById('results').innerText = '';
-    Array.prototype.forEach.call(arguments, function (msg) {
-        if (msg instanceof Error) {
-            msg = "Error: " + msg.message;
-        }
-        else if (typeof msg !== 'string') {
-            msg = JSON.stringify(msg, null, 2);
-        }
-        //document.getElementById('results').innerHTML += "";//msg + '\r\n';
-        console.log(msg);
-    });
-}
 
 $("#btnNuevaTarea").click(function () {
     $("#descripcion").val('');
@@ -124,8 +108,6 @@ function peticionObtenerTareas(consulta) {
         xhr.open("GET", url);
         xhr.onload = function () {
             var tareas = JSON.parse(xhr.responseText);
-            log(xhr.status, tareas);
-
             var content = '';
             var No = 'No';
             var Si = 'Si';

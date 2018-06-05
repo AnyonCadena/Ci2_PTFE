@@ -1,0 +1,13 @@
+{
+  "name": "pruebafrontendci2",
+  "version": "1.0.0",
+  "description": "Prueba técnica FrontEnd Ci2",
+  "main": "gulpfile.js",
+  "author": "Anyon Cadena",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-uglify": "^3.0.0"
+  }
+}

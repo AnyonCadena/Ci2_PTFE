@@ -5,12 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\js\oidc-client.js" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="bootstrap" Version="4.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="Node.js" Version="5.3.0" />
   </ItemGroup>
 
 </Project>
